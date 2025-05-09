@@ -1,4 +1,15 @@
 services:
+  ns:
+    # Use a specific patch because the Lua interface is considered internal and
+    # can have backwards-incompatible changes in patches.
+    image: cznic/knot-resolver:v6.0.12
+    restart: always
+    volumes:
+      - ./knot-resolver:/etc/knot-resolver
+    ports:
+      - "53:53"
+      - "853:853"
+
   web:
     build: .
     restart: always
