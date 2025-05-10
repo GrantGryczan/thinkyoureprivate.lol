@@ -14,8 +14,8 @@ RUN --mount=type=cache,target=target \
     --mount=type=cache,target=/usr/local/cargo/registry \
     <<END
 set -eu
-cargo build --locked --release --package web
-cp ./target/release/web /bin/app
+cargo build --locked --release --package app
+cp ./target/release/app /bin/app
 END
 
 FROM alpine:3 AS final
