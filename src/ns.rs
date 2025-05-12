@@ -10,7 +10,10 @@ use gethostname::gethostname;
 use hickory_server::{
     ServerFuture,
     authority::{Catalog, ZoneType},
-    proto::rr::{Name, RData, Record, RecordSet, RecordType, RrKey, rdata::SOA},
+    proto::rr::{
+        Name, RData, Record, RecordSet, RecordType, RrKey,
+        rdata::{self, SOA},
+    },
     server::{Request, RequestHandler, ResponseHandler, ResponseInfo},
     store::in_memory::InMemoryAuthority,
 };
@@ -39,12 +42,6 @@ pub(crate) async fn serve() {
 
 macro_rules! insert_ip_addr_record_sets {
     ($rtype:ident, $records:expr, $zone_name:expr, $wildcard_name:expr, $ip_addr:expr$(,)?) => {
-        use ::std::collections::BTreeMap;
-
-        use ::hickory_server::proto::rr::{
-            Name, RData, Record, RecordSet, RecordType, RrKey, rdata,
-        };
-
         let records: &mut BTreeMap<RrKey, RecordSet> = $records;
         let zone_name: Name = $zone_name;
         let wildcard_name: Name = $wildcard_name;
