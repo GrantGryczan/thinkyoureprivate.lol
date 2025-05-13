@@ -50,6 +50,9 @@ macro_rules! insert_ip_addr_record_sets {
 
         const TTL: u32 = 60;
 
+        // The hell is up with all this repetition? This is difficult to read. Why did they design
+        // their API like this? Surely there's a nicer API I don't know about? Then I might not need
+        // this macro.
         let mut record_set = RecordSet::new(zone_name.clone(), RecordType::$rtype, 0);
         record_set.insert(Record::from_rdata(zone_name.clone(), TTL, rdata.clone()), 0);
         records.insert(RrKey::new(zone_name.into(), RecordType::$rtype), record_set);
