@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>think you're private? lol</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <p>
+      your computer told me its IP address is {{ ip }}{% if is_tor %}, which I
+      see is on the Tor network{% endif %}.
+    </p>
+  </body>
+</html>
