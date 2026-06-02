@@ -7,7 +7,6 @@ use axum::{
     response::{Html, IntoResponse},
     routing::get,
 };
-use memory_serve::{MemoryServe, load_assets};
 use tokio::{net::TcpListener, sync::RwLock};
 
 use crate::tor_bulk_exit_list::{TorBulkExitList, TorBulkExitListContains};
@@ -27,7 +26,7 @@ pub(crate) async fn serve() {
         tor_bulk_exit_list: RwLock::new(TorBulkExitList::new().await.unwrap()).into(),
     };
 
-    let asset_router = MemoryServe::new(load_assets!("assets"))
+    let asset_router = memory_serve::load!()
         .index_on_subdirectories(true)
         .into_router();
     let app = Router::new()

@@ -4,12 +4,15 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-askama = "0.14"
+askama = "0.16"
 async-trait = "0.1"
 axum = "0.8"
 gethostname = "1"
-hickory-server = "0.25"
-memory-serve = "1"
-reqwest = "0.12"
+hickory-server = "0.26"
+memory-serve = "2"
+reqwest = "0.13"
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
+
+[build-dependencies]
+memory-serve = "2"

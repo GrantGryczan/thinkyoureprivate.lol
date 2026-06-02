@@ -8,14 +8,15 @@ use std::{
 
 use gethostname::gethostname;
 use hickory_server::{
-    ServerFuture,
-    authority::{Catalog, ZoneType},
+    Server,
+    net::runtime::{Time, TokioTime},
     proto::rr::{
         Name, RData, Record, RecordSet, RecordType, RrKey,
         rdata::{self, SOA},
     },
     server::{Request, RequestHandler, ResponseHandler, ResponseInfo},
-    store::in_memory::InMemoryAuthority,
+    store::in_memory::InMemoryZoneHandler,
+    zone_handler::{AxfrPolicy, Catalog, ZoneType},
 };
 use tokio::net::{TcpListener, UdpSocket};
 
@@ -32,9 +33,9 @@ pub(crate) async fn serve() {
     let catalog = build_catalog(&zone_name).await;
     let handler = Handler { zone_name, catalog };
 
-    let mut server = ServerFuture::new(handler);
+    let mut server = Server::new(handler);
     server.register_socket(socket);
-    server.register_listener(listener, Duration::from_secs(5));
+    server.register_listener(listener, Duration::from_secs(5), 32);
 
     println!("Name server ready!");
     server.block_until_done().await.unwrap();
@@ -157,11 +158,16 @@ async fn build_catalog(zone_name: &Name) -> Catalog {
 
     insert_soa_record_set(&mut records, zone_name.clone());
 
-    let authority =
-        InMemoryAuthority::new(zone_name.clone(), records, ZoneType::Primary, false).unwrap();
+    let zone_handler: InMemoryZoneHandler = InMemoryZoneHandler::new(
+        zone_name.clone(),
+        records,
+        ZoneType::Primary,
+        AxfrPolicy::default(),
+    )
+    .unwrap();
 
     let mut catalog = Catalog::new();
-    catalog.upsert(zone_name.into(), vec![Arc::new(authority)]);
+    catalog.upsert(zone_name.into(), vec![Arc::new(zone_handler)]);
     catalog
 }
 
@@ -174,12 +180,12 @@ struct Handler {
 
 #[async_trait::async_trait]
 impl RequestHandler for Handler {
-    async fn handle_request<R: ResponseHandler>(
+    async fn handle_request<R: ResponseHandler, T: Time>(
         &self,
         request: &Request,
         response_handle: R,
     ) -> ResponseInfo {
-        for query in request.queries() {
+        for query in request.queries.queries() {
             let name = query.name().to_string();
             let Some(subdomain) = name.strip_suffix(&format!(".{}", self.zone_name)) else {
                 continue;
@@ -190,6 +196,8 @@ impl RequestHandler for Handler {
             dbg!(subdomain, ip);
         }
 
-        self.catalog.handle_request(request, response_handle).await
+        self.catalog
+            .handle_request::<_, TokioTime>(request, response_handle)
+            .await
     }
 }
