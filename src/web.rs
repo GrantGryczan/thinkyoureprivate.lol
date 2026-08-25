@@ -1,4 +1,4 @@
-use std::{net::SocketAddr, sync::Arc};
+use std::net::SocketAddr;
 
 use askama::Template;
 use axum::{
@@ -15,7 +15,7 @@ use crate::tor_bulk_exit_list::{TorBulkExitList, TorBulkExitListContains};
 struct AppState {
     /// A cached representation of the Tor bulk exit list from
     /// https://check.torproject.org/torbulkexitlist.
-    tor_bulk_exit_list: Arc<RwLock<TorBulkExitList>>,
+    tor_bulk_exit_list: &'static RwLock<TorBulkExitList>,
 }
 
 /// Runs the web server for our domain.
@@ -23,7 +23,7 @@ pub(crate) async fn serve() {
     let listener = TcpListener::bind("0.0.0.0:80").await.unwrap();
 
     let state = AppState {
-        tor_bulk_exit_list: RwLock::new(TorBulkExitList::new().await.unwrap()).into(),
+        tor_bulk_exit_list: Box::leak(RwLock::new(TorBulkExitList::new().await.unwrap()).into()),
     };
 
     let asset_router = memory_serve::load!()
