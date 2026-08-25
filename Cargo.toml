@@ -9,10 +9,10 @@ async-trait = "0.1"
 axum = "0.8"
 gethostname = "1"
 hickory-server = "0.26"
-memory-serve = "2"
+memory-serve = { version = "2", features = ["force-embed"] }
 reqwest = "0.13"
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 
 [build-dependencies]
-memory-serve = "2"
+memory-serve = { version = "2", features = ["force-embed"] }
