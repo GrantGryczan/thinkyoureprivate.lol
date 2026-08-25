@@ -30,9 +30,9 @@ pub(crate) async fn serve() {
         .index_on_subdirectories(true)
         .into_router();
     let app = Router::new()
+        .merge(asset_router)
         .route("/display-your-info", get(display_your_info))
         .with_state(state)
-        .fallback_service(asset_router)
         .into_make_service_with_connect_info::<SocketAddr>();
 
     println!("Web server ready!");
