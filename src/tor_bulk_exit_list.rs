@@ -10,7 +10,7 @@ use tokio::sync::RwLock;
 /// https://check.torproject.org/torbulkexitlist.
 #[derive(Clone, Debug)]
 pub(crate) struct TorBulkExitList {
-    pub(crate) last_updated_at: Instant,
+    last_updated_at: Instant,
     ip_addrs: BTreeSet<IpAddr>,
 }
 
