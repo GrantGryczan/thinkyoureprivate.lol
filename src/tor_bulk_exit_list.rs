@@ -16,7 +16,7 @@ pub(crate) struct TorBulkExitList {
 
 impl TorBulkExitList {
     /// How long the data upstream can be cached for.
-    pub(crate) const MAX_AGE: Duration = Duration::from_secs(60 * 30);
+    pub(crate) const MAX_AGE: Duration = Duration::from_mins(30);
 
     /// Creates a new `TorBulkExitList` by requesting current upstream data.
     pub(crate) async fn new() -> reqwest::Result<Self> {
